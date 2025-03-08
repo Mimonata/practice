@@ -6,14 +6,15 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 16:40:48 by spitul            #+#    #+#             */
-/*   Updated: 2024/11/17 20:18:40 by spitul           ###   ########.fr       */
+/*   Updated: 2024/11/18 19:58:57 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 
-#define N 31
+//#define N 31
 
 void	set_half_line(int matrix[N][N], int x, int y, int n)
 {
@@ -33,7 +34,7 @@ void	set_half_column(int matrix[N][N], int x, int y, int n)
 	}
 }
 
-int spiral_check(int matrix[N][N], int m)
+int spiral_check(int **matrix, int N)
 {
 	int	x;
 	int	y;
@@ -77,7 +78,33 @@ int spiral_check(int matrix[N][N], int m)
 	}
 }
 
-void	spiralize(int matrix[N][N])
+void	free_matrix(int **matrix, int i)
+{
+	while (matrix)
+}
+
+int	**create_matrix(int **matrix, int N)
+{
+	int i = 0;
+
+	matrix = malloc(N * sizeof(int));
+	if (!matrix)
+		return (NULL);
+	while (i < N)
+	{
+		matrix[i] = malloc(N * sizeof(int));
+		if (!matrix[i])
+		{
+			
+			//free_matrix(matrix, i);
+			return (NULL);
+		}
+		i ++;
+	}
+	return (matrix);
+}
+
+void	spiralize(int **matrix, int N)
 {
 	int	x;
 	int	y;
@@ -85,6 +112,7 @@ void	spiralize(int matrix[N][N])
 
 	x = 0;
 	y = 0;
+	matrix = create_matrix(matrix, N);
 	while (y < N)
 	{
 		x = 0;
@@ -112,13 +140,14 @@ void	spiralize(int matrix[N][N])
 
 int	main(void)
 {
-	int	matrix[N][N];
+	int	**matrix;
 	int	x;
 	int	y;
+	int N = 5;
 
 	x = 0;
 	y = 0;
-	spiralize(matrix);
+	spiralize(matrix, N);
 	while (y < N)
 	{
 		x = 0;
