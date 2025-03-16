@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:16:38 by spitul            #+#    #+#             */
-/*   Updated: 2025/03/05 18:41:33 by spitul           ###   ########.fr       */
+/*   Updated: 2025/03/16 19:01:43 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,20 +41,20 @@ int	counter(char *s, int len)
 bool	checker(char *s, int len)
 {
 	int	i;
-	int	bal;
+	int	balance;
 
 	i = 0;
-	bal = 0;
+	balance = 0;
 	while (s[i])
 	{
 		if (s[i] == '(')
-			bal++;
+			balance++;
 		else if (s[i] == ')')
-			bal--;
-		if (bal < 0)
+			balance--;
+		if (balance < 0)
 			return (0);
 	}
-	if (bal == 0)
+	if (balance == 0)
 		return (1);
 	return (0);
 }

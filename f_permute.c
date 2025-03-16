@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 17:14:11 by spitul            #+#    #+#             */
-/*   Updated: 2025/03/07 17:54:29 by spitul           ###   ########.fr       */
+/*   Updated: 2025/03/16 19:00:36 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +53,12 @@ void	f_perm(char *s, int len, int index)
 		puts(s);
 		return ;
 	}
-	j = 0;
+	
 	i = index;
 	while (i < len)
 	{
 		swap(s, i, index);
+		j = 0;
 		while (s[j])
 		{
 			new[j] = s[j];
