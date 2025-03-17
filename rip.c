@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:16:38 by spitul            #+#    #+#             */
-/*   Updated: 2025/03/07 12:30:16 by spitul           ###   ########.fr       */
+/*   Updated: 2025/03/09 21:04:35 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,14 @@
 #include <string.h>
 #include <unistd.h>
 
+bool	checker(char *s, int len);
+
 int	counter(char *s, int len)
 {
 	int	i;
 	int	op;
 	int	cl;
 
-	if (!checker(s, len))
-		return (0);
 	op = 0;
 	cl = 0;
 	i = 0;
@@ -81,7 +81,7 @@ bool	checker_2(char *s, int len, int rem)
 
 void	rip(char *s, int len, int index, int rem)
 {
-	if (index == len)
+	if (index == (len - 1))
 	{
 		if (checker_2(s, len, rem))
 			printf("%s", s);
