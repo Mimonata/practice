@@ -6,7 +6,11 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/07 17:14:11 by spitul            #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/03/09 19:24:49 by spitul           ###   ########.fr       */
+=======
+/*   Updated: 2025/03/16 19:00:36 by spitul           ###   ########.fr       */
+>>>>>>> cd72b8b8d52a2ab2922743845a59a260f9204a6d
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,11 +57,16 @@ void	f_perm(char *s, int len, int index)
 		puts(s);
 		return ;
 	}
+<<<<<<< HEAD
+=======
+	
+>>>>>>> cd72b8b8d52a2ab2922743845a59a260f9204a6d
 	i = index;
 	while (i < len)
 	{
 		j = 0;
 		swap(s, i, index);
+		j = 0;
 		while (s[j])
 		{
 			new[j] = s[j];
