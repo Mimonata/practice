@@ -15,7 +15,7 @@ int	size_mat(char **cmds[])
 	return (i);
 }
 
-int	picoshell(char **cmds[])
+/*int	picoshell(char **cmds[])
 {
 	pid_t	pid;
 	int		pfd[2];
@@ -65,48 +65,42 @@ int	picoshell(char **cmds[])
 	while (wait(NULL) > 0)
 				;
 	return (0);
-}
+}*/
 
 
 
 
-/*int	picoshell_1(char **cmds[])
+int	picoshell(char **cmds[])
 {
-	int	size;
+	int	last_in;
+	int	pfd[2];
 	int	i;
 	pid_t	pid;
-	int	pfd[2];
-	int last_in;
 
-	size = size_mat(cmds);
 	last_in = STDIN_FILENO;
-	// pfd = calloc(size - 1, sizeof(int[2]));
-	// if (!pfd)
-	// 	return (0);
 	i = 0;
-	while (i < size)
+	while(cmds[i])
 	{
 		if (cmds[i + 1])
+		{
 			if (pipe(pfd) == -1)
-			{
-				return (perror("Pipe"), 1);
-			}
+				return (perror("pipes"), 1);
+		}
 		pid = fork();
 		if (pid == -1)
-		{
-			return (perror("Fork"), 1);
-		}
+			return(perror("fork"), 1);
 		if (pid == 0)
 		{
-			if (i > 0)
+			if (last_in != STDIN_FILENO)
 			{
-				dup2(last_in, 0);
+				dup2(last_in, STDIN_FILENO);
 				close(last_in);
 			}
-			if (i < size - 1)
+			if (cmds[i + 1])
 			{
-				dup2(pfd[1], 1);
-				close(pfd[1]);
+				close (pfd[0]);
+				dup2(pfd[1], STDOUT_FILENO);
+				close (pfd[1]);
 			}
 			execvp(cmds[i][0], cmds[i]);
 			exit (1);
@@ -114,19 +108,21 @@ int	picoshell(char **cmds[])
 		else
 		{
 			if (last_in != STDIN_FILENO)
-				close(last_in);
+			{
+				close (last_in); 
+			}
 			if (cmds[i + 1])
 			{
-				close(pfd[1]);
 				last_in = pfd[0];
+				close(pfd[1]);
 			}
 		}
-	i++;
+		i ++;
 	}
 	while (wait(NULL) > 0)
 		;
 	return (0);
-}*/
+}
 
 int	main(int argc, char **argv)
 {
