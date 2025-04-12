@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 14:48:10 by spitul            #+#    #+#             */
-/*   Updated: 2025/04/07 08:59:57 by spitul           ###   ########.fr       */
+/*   Updated: 2025/04/12 09:51:46 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,40 +95,76 @@ static int	get_size(char *s)
 	return (size);
 }
 
-/*static int	find_char(char *s, char *ret, int *ind)
+static int	match_char(char *s)
 {
-	int		i;
-	int		j;
-	int		k;
-	int		size;
-	bool	found;
+	int	i;
+	int	k;
+	int	found;
 
-	size = 0;
+	if (!s)
+		return (0);
 	i = 0;
+	k = 0;
 	found = 0;
-	while (s[i])
+	while (morse[i] && !found && s[k])
 	{
-		j = 0;
-		while (morse[j] && !is_space(s[i]))
+		k = 0;
+		while (morse[i][k] && !found && s[k])
 		{
-			k = 0;
-			if (s[i + k] == morse[j][k] && !is_space(s[i + k]))
+			if (s[k] == morse[i][k] && s[k])
+				k ++;
+			else if (s[k] != morse[i][k] && s[k])
+				break ;
+			else if (s[k] == 0)
 			{
-				k++;
-			}
-			else if (is_space(s[i + k]) && morse[j][k] == NULL)
-			{
-				ret[*ind] = ascii[j];  
-				*ind ++;
-			}
-			else
-			{
-				j ++;
+				found = 1;
+				printf("%c", ascii[i]);
+				break ;
 			}
 		}
-		i++;
+		i ++;
 	}
-}*/
+	return (found);
+}
+static int	match_first(char *s)
+{
+	int	i;
+	int	found;
+	
+	if (!s)
+		return (0);
+	i = 0;
+	found = 0;
+	while (!is_space(s[i]) && s[i])
+		i ++;
+	s[i] = '\0';
+	found = match_char(s);
+	return (found);
+}
+
+static int	match_word(char *ret)
+{
+	int		found;
+	char	*token;
+
+	found = 0;
+	if (!ret)
+		return (0);
+	token = strtok(ret, " ");
+	if (token)
+		found = match_first(ret);
+	while (token && found == 1)
+	{
+		found = match_char(skip_space(token));
+		token = strtok(NULL, " ");
+	}
+	if (token && ! found)
+	{
+		printf("No match for %s\n", token);
+		return (0);
+	}
+	return (found);
+}
 
 char	**set_pointers(char *s, char **ret, int size)
 {
@@ -164,12 +200,19 @@ char	*decode_morse(const char *morse_code)
 {
 	int	size;
 	char **ret;
+	int		i;
 	
 	size = 0;
 	size = get_size((char *)morse_code); 
 	if (!(ret = calloc(size + 1, 1))) 
 		return (NULL);
 	ret = set_pointers((char *)morse_code, ret, size + 1);
+	i = 0;
+	while (ret[i])
+	{
+		match_word(ret[i]);
+		i ++;
+	}
 }	
 
 int	main(void)
