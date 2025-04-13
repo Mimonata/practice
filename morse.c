@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 14:48:10 by spitul            #+#    #+#             */
-/*   Updated: 2025/04/12 09:51:46 by spitul           ###   ########.fr       */
+/*   Updated: 2025/04/13 09:44:32 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,6 @@ static char	*skip_space(char *s)
 {
 	if (!s)
 		return (NULL);
-	// while (s[*index] && ((s[*index] >= 8 && s[*index] <= 13) || s[*index] == 32))
-	// 	(*index)++;
-	// return (&(s[*index]));
-	// }
-	// else
-	// {
 	while (*s && ((*s >= 8 && *s <= 13) || *s == 32))
 		s ++;
 	return (s);
@@ -108,37 +102,22 @@ static int	match_char(char *s)
 	found = 0;
 	while (morse[i] && !found && s[k])
 	{
-		k = 0;
 		while (morse[i][k] && !found && s[k])
 		{
 			if (s[k] == morse[i][k] && s[k])
 				k ++;
 			else if (s[k] != morse[i][k] && s[k])
 				break ;
-			else if (s[k] == 0)
+			if (s[k] == 0 && morse[i][k] == 0)
 			{
 				found = 1;
-				printf("%c", ascii[i]);
+				printf("%s", ascii[i]);
 				break ;
 			}
 		}
+		k = 0;
 		i ++;
 	}
-	return (found);
-}
-static int	match_first(char *s)
-{
-	int	i;
-	int	found;
-	
-	if (!s)
-		return (0);
-	i = 0;
-	found = 0;
-	while (!is_space(s[i]) && s[i])
-		i ++;
-	s[i] = '\0';
-	found = match_char(s);
 	return (found);
 }
 
@@ -146,13 +125,12 @@ static int	match_word(char *ret)
 {
 	int		found;
 	char	*token;
+	char	*str;
 
-	found = 0;
+	found = 1;
 	if (!ret)
 		return (0);
 	token = strtok(ret, " ");
-	if (token)
-		found = match_first(ret);
 	while (token && found == 1)
 	{
 		found = match_char(skip_space(token));
@@ -211,15 +189,15 @@ char	*decode_morse(const char *morse_code)
 	while (ret[i])
 	{
 		match_word(ret[i]);
+		printf(" ");
 		i ++;
 	}
+	printf("\n");
 }	
 
 int	main(void)
 {
-	char	s[] = "      t  m      bn   nm      ";
+	char	s[] = ".... . -.--   .--- ..- -.. .";
 	decode_morse(s);
-//	int n = strlen();
-	printf("%s\n", s);
 	return (0);
 }
