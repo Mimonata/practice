@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/18 14:48:10 by spitul            #+#    #+#             */
-/*   Updated: 2025/04/13 09:44:32 by spitul           ###   ########.fr       */
+/*   Updated: 2025/04/13 11:10:12 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,12 +65,13 @@ static int	get_size(char *s)
 {
 	int	size;
 	char	*token;
-	int	*i;
 
 	if (!s)
 		return (0);
 	s = skip_space(s);
 	token = strstr(s, "   ");
+	if (token == NULL && !str_has_char(s))
+		return (0);
 	if (token == NULL && str_has_char(s))
 		return (1);
 	size = 1;
@@ -125,7 +126,6 @@ static int	match_word(char *ret)
 {
 	int		found;
 	char	*token;
-	char	*str;
 
 	found = 1;
 	if (!ret)
@@ -136,7 +136,7 @@ static int	match_word(char *ret)
 		found = match_char(skip_space(token));
 		token = strtok(NULL, " ");
 	}
-	if (token && ! found)
+	if (token && !found)
 	{
 		printf("No match for %s\n", token);
 		return (0);
@@ -144,7 +144,7 @@ static int	match_word(char *ret)
 	return (found);
 }
 
-char	**set_pointers(char *s, char **ret, int size)
+char	**set_pointers(char *s, char **ret)
 {
 	int	i;
 	char	*token;
@@ -152,6 +152,8 @@ char	**set_pointers(char *s, char **ret, int size)
 	if (!s)
 		return (0);
 	s = skip_space(s);
+	if (s == NULL)
+		return (NULL);
 	ret[0] = s;
 	token = strstr(s, "   ");
 	if (token == NULL && str_has_char(s))
@@ -174,7 +176,7 @@ char	**set_pointers(char *s, char **ret, int size)
 	return (ret);
 }
 
-char	*decode_morse(const char *morse_code)
+void 	decode_morse(const char *morse_code)
 {
 	int	size;
 	char **ret;
@@ -182,9 +184,11 @@ char	*decode_morse(const char *morse_code)
 	
 	size = 0;
 	size = get_size((char *)morse_code); 
-	if (!(ret = calloc(size + 1, 1))) 
-		return (NULL);
-	ret = set_pointers((char *)morse_code, ret, size + 1);
+	if (size == 0)
+		return ;
+	if (!(ret = calloc(size + 1, sizeof(char *)))) 
+		return ;
+	ret = set_pointers((char *)morse_code, ret);
 	i = 0;
 	while (ret[i])
 	{
@@ -193,11 +197,15 @@ char	*decode_morse(const char *morse_code)
 		i ++;
 	}
 	printf("\n");
+	//free (ret);
 }	
 
 int	main(void)
 {
 	char	s[] = ".... . -.--   .--- ..- -.. .";
+	char	t[] = "x .- y ";
+	
 	decode_morse(s);
+	decode_morse(t);
 	return (0);
 }
