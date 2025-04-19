@@ -1,27 +1,121 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   pico.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/17 14:10:11 by spitul            #+#    #+#             */
-/*   Updated: 2025/03/17 14:19:41 by spitul           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
-int	picoshell(char **cmds[])
+int	size_mat(char **cmds[])
 {
-	int		fdpipe[2];
+	int	i;
+
+	i = 0;
+	while (cmds[i] != NULL)
+		i++;
+	return (i);
+}
+
+/*int	picoshell(char **cmds[])
+{
+	pid_t	pid;
+	int		pfd[2];
+	int		last_in;
+	int		i;
+	int		last_in;
+	int		pfd[2];
+	int		i;
 	pid_t	pid;
 
-	
+	last_in = STDIN_FILENO;
+	i = 0;
+	while(cmds[i])
+	{
+		if (cmds[i + 1])
+		{
+			if (pipe(pfd) == -1)
+				return(perror("pipes"), 1);
+		}
+		pid = fork();
+		if (pid == -1)
+			return (perror("fork"), 1);
+		if (pid == 0)
+		{
+			if (last_in != STDIN_FILENO)
+			{
+				dup2(last_in, STDIN_FILENO);
+				close(last_in);
+			}
+			if (cmds[i + 1])
+			{
+				close(pfd[0]);
+				dup2(pfd[1], STDOUT_FILENO);
+				close (pfd[1]);
+			}
+			execvp(cmds[i][0], cmds[i]);
+			exit (1);
+		}
+		else
+		{
+			if (last_in != STDIN_FILENO)
+				close(last_in);
+			if (cmds[i + 1])
+			{
+				last_in = pfd[0];
+				close(pfd[1]);
+			}
+		}
+		i++;
+	}
+	while (wait(NULL) > 0)
+				;
+	return (0);
+}*/
+int	picoshell(char **cmds[])
+{
+	last_in = STDIN_FILENO;
+	i = 0;
+	while (cmds[i])
+	{
+		if (cmds[i + 1])
+		{
+			if (pipe(pfd) == -1)
+				return (perror("pipes"), 1);
+		}
+		pid = fork();
+		if (pid == -1)
+			return (perror("fork"), 1);
+		if (pid == 0)
+		{
+			if (last_in != STDIN_FILENO)
+			{
+				dup2(last_in, STDIN_FILENO);
+				close(last_in);
+			}
+			if (cmds[i + 1])
+			{
+				close(pfd[0]);
+				dup2(pfd[1], STDOUT_FILENO);
+				close(pfd[1]);
+			}
+			execvp(cmds[i][0], cmds[i]);
+			exit(1);
+		}
+		else
+		{
+			if (last_in != STDIN_FILENO)
+			{
+				close(last_in);
+			}
+			if (cmds[i + 1])
+			{
+				last_in = pfd[0];
+				close(pfd[1]);
+			}
+		}
+		i++;
+	}
+	while (wait(NULL) > 0)
+		;
+	return (0);
 }
 
 int	main(int argc, char **argv)

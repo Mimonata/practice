@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   rip.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/05 18:16:38 by spitul            #+#    #+#             */
+<<<<<<< HEAD
+/*   Updated: 2025/03/09 21:04:35 by spitul           ###   ########.fr       */
+=======
 /*   Updated: 2025/03/16 19:01:43 by spitul           ###   ########.fr       */
+>>>>>>> cd72b8b8d52a2ab2922743845a59a260f9204a6d
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +19,14 @@
 #include <string.h>
 #include <unistd.h>
 
+bool	checker(char *s, int len);
+
 int	counter(char *s, int len)
 {
 	int	i;
 	int	op;
 	int	cl;
 
-	if (!checker(s, len))
-		return (0);
 	op = 0;
 	cl = 0;
 	i = 0;
@@ -32,9 +36,8 @@ int	counter(char *s, int len)
 			op++;
 		else if (s[i] == ')')
 			cl++;
+		i ++;
 	}
-	if (op == cl)
-		return (0);
 	return (op - cl);
 }
 
@@ -53,13 +56,14 @@ bool	checker(char *s, int len)
 			balance--;
 		if (balance < 0)
 			return (0);
+		i ++;
 	}
 	if (balance == 0)
 		return (1);
 	return (0);
 }
 
-bool	checker_2(char *s, int len)
+bool	checker_2(char *s, int len, int rem)
 {
 	int	i;
 	int	repl;
@@ -72,30 +76,33 @@ bool	checker_2(char *s, int len)
 	{
 		if (s[i] == ' ')
 			repl++;
+		i++;
 	}
-	if (repl != max)
+	if (repl != max || rem != max)
 		return (0);
 	return (1);
 }
 
-void	rip(char *s, int len, int index)
+void	rip(char *s, int len, int index, int rem)
 {
-	if (index == len)
+	if (index == (len - 1))
 	{
-		if (checker_2(s, len))
+		if (checker_2(s, len, rem))
 			printf("%s", s);
 	}
-	rip(s, len, index + 1);
+	rip(s, len, index + 1, rem);
 	s[index] = ' ';
-	rip(s, len, index + 1);
+	rip(s, len, index + 1, rem);
 }
 
 int	main(int ac, char **av)
 {
 	int	len;
+	int max;
 
 	if (ac != 2)
 		return (-1);
 	len = strlen(av[1]);
-	rip(av[1], len, 0);
+	max = counter(av[1], len);
+	rip(av[1], len, 0, max);
 }
