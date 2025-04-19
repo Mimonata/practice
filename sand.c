@@ -1,99 +1,86 @@
-#include <stdbool.h>
-#include <stdlib.h>
-#include <signal.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   sand.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/19 12:47:31 by spitul            #+#    #+#             */
+/*   Updated: 2025/04/19 16:01:32 by spitul           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include <stdio.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <stdio.h>
-#include <errno.h>
-#include <string.h>
-#include <fcntl.h>
+#include <signal.h>
+#include <stdlib.h>
 
-pid_t g_pid = 0;
-int g_killcalled = 0;
+pid_t	g_child = -1;
 
-void good_function(void)
+void	handle_timeout(int sig)
 {
-	return;
-}
-
-void bad_infinite(void)
-{
-	while (1)
-		;
-}
-
-void signal_handler(int sig)
-{
-	kill(g_pid, SIGKILL);
 	(void)sig;
-	g_killcalled = 1;
+	if (g_child > 0)
+		kill(g_child, SIGKILL);
 }
 
-int sandbox(void (*f)(void), unsigned int timeout, bool verbose)
+int	sandbox(void (*f)(void), unsigned int timeout, bool verbose)
 {
-	pid_t pid;
-	int status;
-	struct sigaction s;
-	int exitcode;
-
+	pid_t	pid;
+	int		status;
+	int		e;
+	struct sigaction	sa = {0};
+	
 	pid = fork();
 	if (pid == -1)
-		return -1;
-	g_pid = pid;
-	
+		return (-1);
 	if (pid == 0)
 	{
 		f();
-		exit(0);
+		exit (0);
 	}
-
-	s.sa_handler = signal_handler;
-	s.sa_flags = SA_RESTART;
-	if (sigaction(SIGALRM, &s, NULL) < 0)
+	sa.sa_handler = handle_timeout;
+	if (sigaction(SIGALRM, &sa, NULL) == -1)
 		return (-1);
-
+	g_child = pid;
 	alarm(timeout);
-
-	if (waitpid(pid, &status, 0) == -1)
-		return (-1);
-
+	waitpid(pid, &status, NULL);
 	if (WIFEXITED(status))
 	{
-		exitcode = WEXITSTATUS(status);
-		if (exitcode == 0)
+		if (WEXITSTATUS(status) == 0)
 		{
 			if (verbose)
 				printf("Nice function!\n");
-			return 1;
+			return (1);
 		}
-		else
+		else 
 		{
 			if (verbose)
-				printf("Bad function: exited with code %d\n", exitcode);
-			return 0;
+				printf("Bad function exited with code %d\n", WEXITSTATUS(status));
+			return (0);
 		}
 	}
 	if (WIFSIGNALED(status))
 	{
-		exitcode = WTERMSIG(status);
-		if (exitcode == SIGKILL && g_killcalled == 1)
+		e = WTERMSIG(status);
+		if (verbose)
 		{
-			if (verbose && timeout > 0)
-				printf("Bad function: timed out after %i seconds\n", timeout);
+			if (e == SIGKILL)
+				printf("Bad function: function timed out after %d seconds\n", timeout);
+			else
+				printf ("Bad function: %d\n", strsignal(e));
 		}
-		else
-		{
-			if (verbose)
-				printf("Bad function: %s\n", strsignal(exitcode));
-		}
-		return 0;
+		return (0);
 	}
 	return (-1);
 }
 
-int main(void)
+
+
+int main()
 {
-	int exitstatus = sandbox(bad_infinite, 4, true);
-	printf("Exit status: %d\n", exitstatus);
+	
 }
