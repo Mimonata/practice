@@ -1,15 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   vbc1.c                                             :+:      :+:    :+:   */
+/*   vbc2.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/26 09:59:44 by spitul            #+#    #+#             */
-/*   Updated: 2025/04/30 22:49:40 by spitul           ###   ########.fr       */
+/*   Created: 2025/04/30 22:33:36 by spitul            #+#    #+#             */
+/*   Updated: 2025/04/30 23:07:24 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <unistd.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -25,7 +26,7 @@ typedef struct node {
     struct node *r;
 }   node;
 
-node	*lowest_prio(char **s);
+node	*low_prio(char **s);
 
 node *new_node(node n)
 {
@@ -76,15 +77,14 @@ int expect(char **s, char c)
 
 node	*extract_num(char **s)
 {
-	node	n;
 	if (isdigit(**s))
 	{
-		n = (node){ .type = VAL, .val = **s - '0', .l = NULL, .r = NULL};
+		node n = { .type = VAL, .val = **s - '0', .l = NULL, .r = NULL};
 		accept(s, **s);
-		return (new_node(n));
+		return(new_node(n));
 	}
 	unexpected_char(**s);
-	return (NULL);
+	return (0);
 }
 
 node	*high_prio(char **s)
@@ -93,7 +93,7 @@ node	*high_prio(char **s)
 	
 	if (accept(s, '('))
 	{
-		ret = lowest_prio(s);
+		ret = low_prio(s);
 		if (!expect(s, ')'))
 		{
 			destroy_tree(ret);
@@ -101,15 +101,15 @@ node	*high_prio(char **s)
 		}
 		return (ret);
 	}
-	return (extract_num(s));
+	else
+		return (extract_num(s));
 }
 
 node	*middle_prio(char **s)
 {
 	node	*ret;
 	node	*right;
-	node	n;
-
+	
 	ret = high_prio(s);
 	while (accept(s, '*'))
 	{
@@ -119,18 +119,17 @@ node	*middle_prio(char **s)
 			destroy_tree(ret);
 			return (NULL);
 		}
-		n = (node){ .type = MULTI, .l = ret, .r = right};
+		node n = {.type = MULTI, .l = ret, .r = right};
 		ret = new_node(n);
 	}
-	return (ret);
+	return(ret);
 }
 
-node	*lowest_prio(char **s)
+node	*low_prio(char **s)
 {
-	node	*ret;
+	node 	*ret;
 	node	*right;
-	node	n;
-	
+
 	ret = middle_prio(s);
 	while (accept(s, '+'))
 	{
@@ -140,7 +139,7 @@ node	*lowest_prio(char **s)
 			destroy_tree(ret);
 			return (NULL);
 		}
-		n = (node){.type = ADD, .l = ret, .r = right};
+		node n = {.type = ADD, .l = ret, .r = right};
 		ret = new_node(n);
 	}
 	return (ret);
@@ -149,9 +148,8 @@ node	*lowest_prio(char **s)
 node *parse_expr(char **s)
 {
     node	*ret;
-	
-	ret = lowest_prio(s);
-	// Your code is here
+
+	ret = low_prio(s);
     if(**s)
     {
         destroy_tree(ret);
@@ -177,8 +175,7 @@ int main (int argc, char** argv)
 {
     if (argc!= 2)
         return 1;
-	char	*inp = argv[1];
-    node *tree = parse_expr(&inp);
+    node *tree = parse_expr(&argv[1]);
     if (!tree)
         return 1;
     printf("%d\n", eval_tree(tree));
