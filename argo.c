@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/01 20:41:40 by spitul            #+#    #+#             */
-/*   Updated: 2025/05/07 08:18:00 by spitul           ###   ########.fr       */
+/*   Updated: 2025/05/08 08:45:13 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,7 +216,59 @@ int	argo(json *dst, FILE *stream)
 
 int	parse_map(json *dst, FILE *f)
 {
+	int	c;
+	json	val;
 	
+	skip_ws(f);
+	c = getc(f);
+	if (c != '{')
+	{
+		printf("Unexpected token at %c\n", c);
+		return (-1);
+	}
+	dst->type = MAP;
+	dst->map.data = NULL;
+	dst->map.size = 0;
+	c = getc(f);
+	if (c == '}')
+		return 1;
+	ungetc(c, f);
+	while(1)
+	{
+		skip_ws(f);
+		char	*key = parse_str(f);
+		if (!key)
+			return(-1);
+		
+		skip_ws(f);
+		c = getc(f);
+		if (c != ':')
+		{
+			printf ("Unexpected %c\n", c);
+			free (key);
+			return -1;
+		}
+		skip_ws(f);
+		if (argo(&val, f) == -1)
+		{
+			free(key);
+			return -1;
+		}
+		dst->map.data = realloc(dst->map.data, (dst->map.size + 1) * sizeof(pair));
+		dst->map.data[dst->map.size].key = key;
+		dst->map.data[dst->map.size].value = val;
+		dst->map.size ++;
+		skip_ws(f);
+		c = getc(f);
+		if (c == '}')
+			break;
+		if (c != ',')
+		{
+			printf("Unexpected %c\n", c);
+			return -1;
+		}
+	}
+	return 1;
 }
 
 int	argo(json *dst, FILE *stream)

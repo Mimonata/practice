@@ -9,7 +9,7 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/a.out",
-			"args": [],
+			"args": ["launch.json"],
 			"stopAtEntry": true,
 			"cwd": "${fileDirname}",
 			"environment": [],
