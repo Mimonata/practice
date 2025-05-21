@@ -9,7 +9,7 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${workspaceFolder}/a.out",
-			"args": ["launch.json"],
+			"args": ["1)"],
 			"stopAtEntry": true,
 			"cwd": "${fileDirname}",
 			"environment": [],
@@ -17,7 +17,7 @@
 			"MIMode": "gdb",
 			"setupCommands": [
 				{
-					"description": "Enable pretty-printing for gdb\k",
+					"description": "Enable pretty-printing for gdb",
 					"text": "-enable-pretty-printing",
 					"ignoreFailures": true
 				},
