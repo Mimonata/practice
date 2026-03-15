@@ -3,16 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   miniserv.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 07:39:27 by spitul            #+#    #+#             */
-/*   Updated: 2026/03/11 07:45:00 by spitul           ###   ########.fr       */
+/*   Updated: 2026/03/15 11:28:33 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <sys/socket.h>
 #include <stdio.h>
 #include <sys/select.h>
+
+int	setup_server()
+{
+	int	sfd;
+
+	sfd = socket(AF_INET, SOCK_STREAM, 0);
+	bind(sfd, )
+}
 
 void	minserv(int port)
 {
