@@ -6,7 +6,7 @@
 /*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 07:39:37 by spitul            #+#    #+#             */
-/*   Updated: 2026/03/09 07:40:04 by spitul           ###   ########.fr       */
+/*   Updated: 2026/04/20 08:00:00 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <netdb.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/select.h>
 
 int extract_message(char **buf, char **msg)
 {
@@ -64,9 +65,23 @@ char *str_join(char *buf, char *add)
 	return (newbuf);
 }
 
+int	server_broadcast(int sender_fd, int max_fd, fd_set *read_fd, int server_fd, char *msg)
+{
+	for (int i = 0; i < max_fd; i++)
+	{
+		if (FD_ISSET(i, read_fd) && i != sender_fd && i != server_fd)
+			send(i, msg, strlen(msg), 0);
+	}	
+}
+
 int main() {
 	int sockfd, connfd, len;
 	struct sockaddr_in servaddr, cli; 
+	fd_set	read_fd;
+	fd_set	work_fd;
+	char	*client_buf[1024];
+	int		client_ids[1024];
+	int		maxfd;
 
 	// socket create and verification 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0); 
@@ -95,11 +110,42 @@ int main() {
 		exit(0); 
 	}
     len = sizeof(cli);
-	connfd = accept(sockfd, (struct sockaddr *)&cli, &len);
-	if (connfd < 0) { 
-        printf("server accept failed...\n"); 
-        exit(0); 
-    } 
-    else
-        printf("server accept the client...\n");
+	FD_ZERO(&read_fd);
+	FD_SET(sockfd, &read_fd);
+	bzero(client_ids, sizeof(client_ids));
+	maxfd = sockfd;
+	int next_id = 0;
+	while(1)
+	{
+		work_fd = read_fd;
+			
+		if (select(maxfd + 1, &work_fd, NULL, NULL, NULL) <= 0)
+			continue;
+			
+		for (int fd = 0; fd <= maxfd; fd++)
+		{
+			if (FD_ISSET(fd, &work_fd))
+			{
+				if (fd == sockfd)
+				{
+					connfd = accept(sockfd, (struct sockaddr *)&cli, &len);
+					if (connfd < 0) { 
+						printf("server accept failed...\n"); 
+						exit(0); 
+					} 
+					else
+						printf("server accept the client...\n");
+					FD_SET(connfd, &read_fd);
+					if (connfd > maxfd)
+						maxfd = connfd;
+					client_ids[connfd] = next_id++;
+					client_buf[connfd] = NULL;
+					char msg[100];
+					sprintf(msg, "server: client %d just arrived\n", client_ids[connfd]);
+					broadcast(connfd, maxfd, &read_fd, sockfd, msg);
+				}
+			}
+		}
+	}
+	
 }

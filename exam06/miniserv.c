@@ -3,23 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   miniserv.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: spitul <spitul@student.42berlin.de >       +#+  +:+       +#+        */
+/*   By: spitul <spitul@student.42berlin.de>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 07:39:27 by spitul            #+#    #+#             */
-/*   Updated: 2026/03/15 11:28:33 by spitul           ###   ########.fr       */
+/*   Updated: 2026/03/26 07:11:28 by spitul           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <sys/socket.h>
 #include <stdio.h>
 #include <sys/select.h>
+#include <netinet/in.h>
 
-int	setup_server()
+fd_set	active_fd;
+fd_set	read_fd;
+int		max_fd;
+char	*msg[1024];
+
+int	*setup_server(int port)
 {
 	int	sfd;
+	struct sockaddr_in	servaddr;
 
 	sfd = socket(AF_INET, SOCK_STREAM, 0);
-	bind(sfd, )
+	bzero(&servaddr, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+	servaddr.sin_port = htons(port);
+	bind(sfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+	listen(sfd, 10);
+	return &sfd;
 }
 
 void	minserv(int port)
